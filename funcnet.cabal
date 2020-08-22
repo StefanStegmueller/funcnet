@@ -1,0 +1,81 @@
+cabal-version: 1.12
+
+-- This file has been generated from package.yaml by hpack version 0.33.0.
+--
+-- see: https://github.com/sol/hpack
+--
+-- hash: df518854d786d2fcb080c77de3d38575136ca073ec863b7ef85829d121e90a0a
+
+name:           funcnet
+version:        0.1.0.0
+description:    Please see the README on GitHub at <https://github.com/StefanStegmueller/funcnet#readme>
+homepage:       https://github.com/StefanStegmueller/funcnet#readme
+bug-reports:    https://github.com/StefanStegmueller/funcnet/issues
+author:         Stefan Stegmueller
+maintainer:     Stefan.Steg@gmail.com
+copyright:      2020 Stefan Stegmueller
+license:        BSD3
+license-file:   LICENSE
+build-type:     Simple
+extra-source-files:
+    README.md
+    ChangeLog.md
+
+source-repository head
+  type: git
+  location: https://github.com/StefanStegmueller/funcnet
+
+library
+  exposed-modules:
+      Activation
+      Linalg
+      Loss
+      Network
+  other-modules:
+      Paths_funcnet
+  hs-source-dirs:
+      src
+  build-depends:
+      base >=4.7 && <5
+  default-language: Haskell2010
+
+executable funcnet-exe
+  main-is: Main.hs
+  other-modules:
+      SimpleNN
+      Paths_funcnet
+  hs-source-dirs:
+      app
+  ghc-options: -threaded -rtsopts -with-rtsopts=-N
+  build-depends:
+      base >=4.7 && <5
+    , funcnet
+  default-language: Haskell2010
+
+executable simplenn-exe
+  main-is: SimpleNN.hs
+  other-modules:
+      Main
+      Paths_funcnet
+  hs-source-dirs:
+      app
+  ghc-options: -threaded -rtsopts -with-rtsopts=-N -main-is SimpleNN
+  build-depends:
+      base >=4.7 && <5
+    , funcnet
+  default-language: Haskell2010
+
+test-suite funcnet-test
+  type: exitcode-stdio-1.0
+  main-is: Spec.hs
+  other-modules:
+      LinalgSpec
+      Paths_funcnet
+  hs-source-dirs:
+      test
+  ghc-options: -threaded -rtsopts -with-rtsopts=-N
+  build-depends:
+      base >=4.7 && <5
+    , funcnet
+    , hspec
+  default-language: Haskell2010

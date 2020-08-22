@@ -1,3 +1,3 @@
-# Changelog for linalg
+# Changelog for funcnet 
 
 ## Unreleased changes

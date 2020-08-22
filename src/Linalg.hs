@@ -1,14 +1,15 @@
 module Linalg 
-    ( Matrix,
-      zeros,
-      rows,
-      cols,
-      prettyPrint,
-      transpose,
-      add,
-      matmul,
-      smul,
-      hadamard
+    ( Matrix
+    , zeros
+    , rows
+    , cols
+    , prettyPrint
+    , elementWiseOp
+    , transpose
+    , add
+    , matmul
+    , smul
+    , hadamard
     ) where
 
 type Matrix = [[Double]]
@@ -33,8 +34,8 @@ prettyPrint mat = mapM_ printRow mat
   where toString lst = concatMap (\x -> show x ++ "\t") lst
         printRow row = putStrLn $ toString row
 
-elementWiseOp :: Matrix -> Matrix -> (Double -> Double -> Double) -> Matrix
-elementWiseOp m1 m2 op = [[uncurry op y | y <- uncurry zip x]| x <- zip m1 m2]
+elementWiseOp :: (Double -> Double -> Double) -> Matrix -> Matrix -> Matrix
+elementWiseOp op m1 m2 = [[uncurry op y | y <- uncurry zip x]| x <- zip m1 m2]
 
 checkConsistency :: Matrix -> Matrix
 checkConsistency m1
@@ -62,7 +63,7 @@ transpose m1 = [getColumn sm1 j | j <- [0 .. m-1]]
 
 add :: Matrix -> Matrix -> Matrix
 add m1 m2 = add' $ checkSameDims (checkConsistency m1, checkConsistency m2) 
-  where add' (mat1, mat2) = elementWiseOp mat1 mat2 (+) 
+  where add' (mat1, mat2) = elementWiseOp (+) mat1 mat2 
 
 matmul :: Matrix -> Matrix -> Matrix
 matmul m1 m2 = matmul' $ checkMatchingDims (checkConsistency m1, checkConsistency m2)  
@@ -77,5 +78,5 @@ smul s m1 = smul' $ checkConsistency m1
 
 hadamard :: Matrix -> Matrix -> Matrix
 hadamard m1 m2 = hadamard' $ checkSameDims (checkConsistency m1, checkConsistency m2)
-  where hadamard' (mat1, mat2) = elementWiseOp mat1 mat2 (*) 
+  where hadamard' (mat1, mat2) = elementWiseOp (*) mat1 mat2
   
