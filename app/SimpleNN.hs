@@ -35,13 +35,13 @@ main = do
   mapM_ prettyPrint [preActivation lyr | lyr <- layers net2]
   
   putStrLn "+++ Backprop ++++++++++"
-  let gradients = backprop net2 y t
+  let gradients = backprop net2 x y t
   mapM_ prettyPrint gradients
   
 initNetwork :: Network 
 initNetwork = Network layers squaredError  
   where test = zeros 2 3
-        layers = [Layer relu test _T,
-                  Layer tanh test _U,
-                  Layer sigmoid test _V,
-                  Layer sigmoid test _W]
+        layers = [Layer relu test test _T,
+                  Layer tanh test test _U,
+                  Layer sigmoid test test _V,
+                  Layer sigmoid test test _W]

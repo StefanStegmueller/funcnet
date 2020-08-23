@@ -30,7 +30,9 @@ getColumn :: Matrix -> Int -> [Double]
 getColumn m1 c = [row !! c | row <- m1]
 
 prettyPrint :: Matrix -> IO()
-prettyPrint mat = mapM_ printRow mat
+prettyPrint mat = do
+        mapM_ printRow mat
+        putStrLn ""
   where toString lst = concatMap (\x -> show x ++ "\t") lst
         printRow row = putStrLn $ toString row
 
