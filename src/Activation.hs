@@ -11,12 +11,12 @@ module Activation
     ) where
 
 import Prelude hiding (tanh)
+import Util
 
-data Activation = Activation { func :: Double -> Double 
-                             , deriv :: Double -> Double}
+type Activation = Function (Double -> Double)
 
-sigmoid :: Activation
-sigmoid = Activation {func = sigmoid', deriv = sigmoidDeriv}
+sigmoid :: Activation 
+sigmoid = Function {func = sigmoid', deriv = sigmoidDeriv}
 
 sigmoid' :: Double -> Double
 sigmoid' x = 1 / (+) 1 (exp $ -x)
@@ -24,8 +24,8 @@ sigmoid' x = 1 / (+) 1 (exp $ -x)
 sigmoidDeriv :: Double -> Double
 sigmoidDeriv x = sigmoid' x * (1 - sigmoid' x)
 
-tanh :: Activation
-tanh = Activation {func = tanh', deriv = tanhDeriv}
+tanh :: Activation 
+tanh = Function {func = tanh', deriv = tanhDeriv}
 
 tanh' :: Double -> Double
 tanh' x = num / denum
@@ -36,7 +36,7 @@ tanhDeriv :: Double -> Double
 tanhDeriv x = 1 - tanh' x ^ 2
 
 relu :: Activation
-relu = Activation {func = relu', deriv = reluDeriv}
+relu = Function {func = relu', deriv = reluDeriv}
 
 relu' :: Double -> Double
 relu' x

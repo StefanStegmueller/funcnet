@@ -1,14 +1,15 @@
 module Loss 
-        ( Loss
+        ( Loss(..)
         , squaredError
         , squaredErrorDeriv
         ) where
 
-data Loss = Loss { func :: Double -> Double -> Double
-                 , deriv :: Double -> Double -> Double }
+import Util
+
+type Loss = Function (Double -> Double -> Double)
 
 squaredError :: Loss
-squaredError = Loss {func = squaredError', deriv = squaredErrorDeriv}
+squaredError = Function {func = squaredError', deriv = squaredErrorDeriv}
 
 squaredError' :: Double -> Double -> Double
 squaredError' y t = (t-y)^2

@@ -35,7 +35,7 @@ prettyPrint mat = mapM_ printRow mat
         printRow row = putStrLn $ toString row
 
 elementWiseOp :: (Double -> Double -> Double) -> Matrix -> Matrix -> Matrix
-elementWiseOp op m1 m2 = [[uncurry op y | y <- uncurry zip x]| x <- zip m1 m2]
+elementWiseOp = (zipWith . zipWith) 
 
 checkConsistency :: Matrix -> Matrix
 checkConsistency m1
