@@ -4,7 +4,8 @@ module Util
         ( Function (..)
         , func
         , deriv
-        , fst3)
+        , fst3
+        , apply)
         where
 
 import Lens.Simple
@@ -16,3 +17,6 @@ $(makeLenses ''Function)
 
 fst3 :: (a,b,c) -> a
 fst3 (a,_,_) = a
+
+apply :: (a -> b) -> [[a]] -> [[b]]
+apply f lst = (map . map) f lst

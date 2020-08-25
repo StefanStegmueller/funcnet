@@ -30,13 +30,12 @@ t = [[0, 1]]
 main :: IO ()
 main = do
   let net1 = initNetwork
-  let (net2, y) = forward net1 x 
+  let net2 = forward net1 x 
   putStrLn "+++ Feeding forward +++"
-  prettyPrint y 
-  mapM_ prettyPrint $ [lyr ^. preActivation | lyr <- net2 ^. layers] 
+  mapM_ prettyPrint $ [lyr ^. out | lyr <- net2 ^. layers] 
   
   putStrLn "+++ Backprop ++++++++++"
-  let gradients = backprop net2 x y t
+  let gradients = backprop net2 x t
   mapM_ prettyPrint gradients
   
 initNetwork :: Network 
