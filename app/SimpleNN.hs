@@ -1,6 +1,7 @@
 module SimpleNN where
 
 import Prelude hiding (tanh)
+import Lens.Simple 
 
 import Network 
 import Linalg
@@ -32,7 +33,7 @@ main = do
   let (net2, y) = forward net1 x 
   putStrLn "+++ Feeding forward +++"
   prettyPrint y 
-  mapM_ prettyPrint [preActivation lyr | lyr <- layers net2]
+  mapM_ prettyPrint $ [lyr ^. preActivation | lyr <- net2 ^. layers] 
   
   putStrLn "+++ Backprop ++++++++++"
   let gradients = backprop net2 x y t

@@ -9,7 +9,7 @@ import Util
 type Loss = Function (Double -> Double -> Double)
 
 squaredError :: Loss
-squaredError = Function {func = squaredError', deriv = squaredErrorDeriv}
+squaredError = Function {_func = squaredError', _deriv = squaredErrorDeriv}
 
 squaredError' :: Double -> Double -> Double
 squaredError' y t = (t-y)^2

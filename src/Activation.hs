@@ -1,7 +1,5 @@
 module Activation 
     ( Activation
-    , func
-    , deriv
     , sigmoid
     , sigmoidDeriv
     , tanh
@@ -16,7 +14,7 @@ import Util
 type Activation = Function (Double -> Double)
 
 sigmoid :: Activation 
-sigmoid = Function {func = sigmoid', deriv = sigmoidDeriv}
+sigmoid = Function {_func = sigmoid', _deriv = sigmoidDeriv}
 
 sigmoid' :: Double -> Double
 sigmoid' x = 1 / (+) 1 (exp $ -x)
@@ -25,7 +23,7 @@ sigmoidDeriv :: Double -> Double
 sigmoidDeriv x = sigmoid' x * (1 - sigmoid' x)
 
 tanh :: Activation 
-tanh = Function {func = tanh', deriv = tanhDeriv}
+tanh = Function {_func = tanh', _deriv = tanhDeriv}
 
 tanh' :: Double -> Double
 tanh' x = num / denum
@@ -36,7 +34,7 @@ tanhDeriv :: Double -> Double
 tanhDeriv x = 1 - tanh' x ^ 2
 
 relu :: Activation
-relu = Function {func = relu', deriv = reluDeriv}
+relu = Function {_func = relu', _deriv = reluDeriv}
 
 relu' :: Double -> Double
 relu' x
