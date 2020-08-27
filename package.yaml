@@ -21,7 +21,7 @@ description:         Please see the README on GitHub at <https://github.com/Stef
 
 dependencies:
 - base >= 4.7 && < 5
-- lens-simple == 0.1.0.9
+- lens == 4.19.2
 
 library:
   source-dirs: src
@@ -36,7 +36,6 @@ executables:
     - -with-rtsopts=-N
     dependencies:
     - funcnet 
-    - lens-simple==0.1.0.9
   simplenn-exe:
     main:                SimpleNN.hs
     source-dirs:         app

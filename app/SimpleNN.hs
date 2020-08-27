@@ -1,7 +1,7 @@
 module SimpleNN where
 
 import Prelude hiding (tanh)
-import Lens.Simple 
+import Control.Lens
 
 import Network 
 import Linalg
@@ -30,18 +30,19 @@ t = [[0, 1]]
 main :: IO ()
 main = do
   let net1 = initNetwork
-  let net2 = forward net1 x 
+  let net2 = feedForward net1 x 
   putStrLn "+++ Feeding forward +++"
-  mapM_ prettyPrint $ [lyr ^. out | lyr <- net2 ^. layers] 
+  mapM_ prettyPrint $ [lyr ^. out | Dense lyr <- net2 ^. layers] 
   
   putStrLn "+++ Backprop ++++++++++"
-  let gradients = backprop net2 x t
+  let gradients = backprop net2 t
   mapM_ prettyPrint gradients
   
 initNetwork :: Network 
 initNetwork = Network layers squaredError  
   where test = zeros 2 3
-        layers = [Layer relu test test _T,
-                  Layer tanh test test _U,
-                  Layer sigmoid test test _V,
-                  Layer sigmoid test test _W]
+        layers = [ Input x
+                 , Dense (DenseData relu test test _T)
+                 , Dense (DenseData tanh test test _U)
+                 , Dense (DenseData sigmoid test test _V)
+                 , Dense (DenseData sigmoid test test _W)]

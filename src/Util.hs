@@ -8,7 +8,7 @@ module Util
         , apply)
         where
 
-import Lens.Simple
+import Control.Lens
 
 data Function a = Function { _func :: a
                            , _deriv :: a }

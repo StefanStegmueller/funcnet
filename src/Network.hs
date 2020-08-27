@@ -2,6 +2,7 @@
 
 module Network 
   ( Layer (..)
+  , DenseData(..)
   , activation
   , pre
   , out
@@ -9,45 +10,61 @@ module Network
   , Network (..)
   , layers
   , loss
-  , forward
+  , compose
+  , feedForward
   , backprop
   ) where
+
+import Control.Lens hiding (pre)
 
 import Activation
 import Loss
 import Linalg
 import Util
-import Lens.Simple
 
-data Layer = Layer { _activation :: Activation
+data Layer = Input Matrix
+           | Dense DenseData
+
+data DenseData = DenseData { _activation :: Activation
                    , _pre :: Matrix
                    , _out :: Matrix
                    , _weights :: Matrix } 
+makeLenses ''DenseData
 
 data Network = Network { _layers :: [Layer]
                        , _loss :: Loss }
-
-$(makeLenses ''Layer)
-$(makeLenses ''Network)
+makeLenses ''Network
 
 
-forward :: Network -> Matrix -> Network
-forward net inp = net & layers .~ (tail $ foldl feedLayer [dummyLyr] $ net ^. layers)
-  where dummyLyr = Layer { _activation = sigmoid
-                         , _pre = (zeros 1 1)
-                         , _out = inp
-                         , _weights = (zeros 1 1) }
-        modPreAct lastOut lyr = lyr & pre.~ lastOut `matmul` (lyr ^. weights)
+compose :: [Layer] -> [Layer]
+compose lyrs = compose' $ reverse lyrs 
+compose' []     = []
+compose' (x:xs) = (initLayer x : compose' xs) 
+  where initLayer :: Layer -> Layer 
+        initLayer (Dense d) = Dense(d & weights .~ zeros 1 1)
+        initLayer lyr       = lyr
+
+
+feedForward :: Network -> Matrix -> Network
+feedForward net inp = net & layers .~ (map fst $ foldl feedLayer [] $ net ^. layers)
+  where feedLayer modlyrs lyr = modlyrs ++ [forward lyr $ snd $ last modlyrs] 
+
+
+forward :: Layer -> Matrix -> (Layer, Matrix)
+forward (Input x) _       = (Input x, x)
+forward (Dense d) lastOut = (Dense(modDense), modDense ^. out) 
+  where modPreAct lout lyr = lyr & pre.~ lastOut `matmul` (lyr ^. weights)
         modOut lyr = lyr & out .~ (apply (lyr ^. activation . func) $ (lyr ^. pre))
-        feedLayer modlyrs lyr = modlyrs ++ [modOut $ modPreAct (last modlyrs ^. out) lyr] 
+        modDense = modOut $ modPreAct lastOut d
 
-backprop :: Network -> Matrix -> Matrix -> [Matrix]
-backprop net x t = map transpose $ [delta `matmul` x] ++ grads
-  where (outLyr : lyrs) = reverse $ net ^. layers 
+
+backprop :: Network -> Matrix -> [Matrix]
+backprop net t = map transpose $ [delta `matmul` x | Input x <- lyrs] ++ grads
+  where (Dense outLyr : lyrs) = reverse $ net ^. layers 
         dE_aL = elementWiseOp (net ^. loss . deriv) (outLyr ^. out) t
         deltaL = transpose $ hadamard (apply (outLyr ^. activation . deriv) $ outLyr ^. pre) dE_aL 
         compGradients (grads, delta, lastWeights) lyr =  
                 ( [matmul delta $ lyr ^. out] ++ grads
                 , hadamard (transpose $ apply (lyr ^. activation . deriv) (lyr ^. pre)) (matmul lastWeights delta)
                 , lyr ^. weights)
-        (grads, delta, lastWeights) = foldl compGradients ([], deltaL, outLyr ^. weights) lyrs
+        (grads, delta, lastWeights) = foldl compGradients ([], deltaL, outLyr ^. weights) [l | Dense l <- lyrs]

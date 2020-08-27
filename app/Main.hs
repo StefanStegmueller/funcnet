@@ -2,8 +2,9 @@
 
 module Main where
 
+import Control.Lens hiding (index)
+
 import Linalg
-import Lens.Simple
 
 main :: IO ()
 main = putStrLn "hello"
@@ -41,3 +42,21 @@ lensOver1 p = over index (\x -> x + 1) p
 
 lensOver2 :: Person -> Person
 lensOver2 p = p & index %~ (\x -> x + 1) 
+
+-- Prisms Example
+
+data User = Real RealData
+          | Entity EntityData 
+
+data RealData = RD { _name :: String , _age :: Int }
+data EntityData = ED {_legalName :: String}
+
+$(makeLenses ''RealData)
+$(makeLenses ''EntityData)
+
+test :: User 
+test = Real RD { _name = "test", _age = 12  }
+
+
+
+
