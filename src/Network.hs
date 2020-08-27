@@ -36,13 +36,13 @@ data Network = Network { _layers :: [Layer]
 makeLenses ''Network
 
 
-compose :: [Layer] -> [Layer]
-compose lyrs = compose' $ reverse lyrs 
+compose :: [(Layer, Int)] -> [Layer]
+compose lyrs = reverse $ compose' $ reverse lyrs 
 compose' []     = []
-compose' (x:xs) = (initLayer x : compose' xs) 
-  where initLayer :: Layer -> Layer 
-        initLayer (Dense d) = Dense(d & weights .~ zeros 1 1)
-        initLayer lyr       = lyr
+compose' (x:xs) = ((initLayer x $ snd $ head xs) : compose' xs) 
+  where initLayer :: (Layer, Int) -> Int -> Layer 
+        initLayer ((Dense d), m) n = Dense(d & weights .~ zeros n m)
+        initLayer (lyr, _) _       = lyr
 
 
 feedForward :: Network -> Matrix -> Network

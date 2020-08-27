@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 6a3c1c98c01e3f61239ee6f499cbf5e00d5fbb9ca2279ba05a5fc92c7ada6c48
+-- hash: c91fc00c627e56dd3a2cb9089a97ab95deef838234eae9aa06a03bc7397e3bb0
 
 name:           funcnet
 version:        0.1.0.0
@@ -74,6 +74,7 @@ test-suite funcnet-test
   main-is: Spec.hs
   other-modules:
       LinalgSpec
+      NetworkSpec
       Paths_funcnet
   hs-source-dirs:
       test
