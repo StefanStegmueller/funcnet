@@ -2,7 +2,7 @@
 
 module Network 
   ( Layer (..)
-  , DenseData(..)
+  , DenseData
   , activation
   , pre
   , out
@@ -10,6 +10,10 @@ module Network
   , Network (..)
   , layers
   , loss
+  , Gradient (..)
+  , dw
+  , db
+  , dense
   , compose
   , feedForward
   , backprop
@@ -22,49 +26,68 @@ import Loss
 import Linalg
 import Util
 
-data Layer = Input Matrix
-           | Dense DenseData
-
 data DenseData = DenseData { _activation :: Activation
                    , _pre :: Matrix
                    , _out :: Matrix
-                   , _weights :: Matrix } 
+                   , _weights :: Matrix
+                   , _bias :: Matrix } 
 makeLenses ''DenseData
+
+
+data Layer = Input Matrix
+           | Dense DenseData
+
 
 data Network = Network { _layers :: [Layer]
                        , _loss :: Loss }
 makeLenses ''Network
 
 
+data Gradient = Gradient { _dw :: Matrix
+                         , _db :: Matrix } 
+makeLenses ''Gradient
+
+
+dense :: Activation ->  Layer
+dense act = Dense DenseData { _activation = act
+                            , _pre = zeros 1 1
+                            , _out = zeros 1 1
+                            , _weights = zeros 1 1
+                            , _bias = zeros 1 1}
+
+
 compose :: [(Layer, Int)] -> [Layer]
 compose lyrs = reverse $ compose' $ reverse lyrs 
 compose' []     = []
-compose' (x:xs) = ((initLayer x $ snd $ head xs) : compose' xs) 
+compose' (x:xs) = initLayer x (snd $ head xs) : compose' xs 
   where initLayer :: (Layer, Int) -> Int -> Layer 
-        initLayer ((Dense d), m) n = Dense(d & weights .~ zeros n m)
-        initLayer (lyr, _) _       = lyr
+        initLayer (Dense d, m) n = Dense(d & weights .~ zeros n m
+                                           & bias .~ zeros 1 m)
+        initLayer (lyr, _) _     = lyr
 
 
-feedForward :: Network -> Matrix -> Network
-feedForward net inp = net & layers .~ (map fst $ foldl feedLayer [] $ net ^. layers)
+feedForward :: Network -> Network
+feedForward net = net & layers .~ map fst (foldl feedLayer [] $ net ^. layers)
   where feedLayer modlyrs lyr = modlyrs ++ [forward lyr $ snd $ last modlyrs] 
 
 
 forward :: Layer -> Matrix -> (Layer, Matrix)
 forward (Input x) _       = (Input x, x)
-forward (Dense d) lastOut = (Dense(modDense), modDense ^. out) 
-  where modPreAct lout lyr = lyr & pre.~ lastOut `matmul` (lyr ^. weights)
-        modOut lyr = lyr & out .~ (apply (lyr ^. activation . func) $ (lyr ^. pre))
+forward (Dense d) lastOut = (Dense modDense, modDense ^. out) 
+  where modPreAct lout lyr = lyr & pre.~ lout `matmul` (lyr ^. weights) `add` (lyr ^. bias)
+        modOut lyr = lyr & out .~ apply (lyr ^. activation . func) (lyr ^. pre)
         modDense = modOut $ modPreAct lastOut d
 
 
-backprop :: Network -> Matrix -> [Matrix]
-backprop net t = map transpose $ [delta `matmul` x | Input x <- lyrs] ++ grads
+backprop :: Network -> Matrix -> [Gradient]
+backprop net t = map transposeGrad $ [Gradient { _dw = delta `matmul` x, _db = delta } | Input x <- lyrs] ++ grads
   where (Dense outLyr : lyrs) = reverse $ net ^. layers 
         dE_aL = elementWiseOp (net ^. loss . deriv) (outLyr ^. out) t
         deltaL = transpose $ hadamard (apply (outLyr ^. activation . deriv) $ outLyr ^. pre) dE_aL 
         compGradients (grads, delta, lastWeights) lyr =  
-                ( [matmul delta $ lyr ^. out] ++ grads
+                ( Gradient { _dw = matmul delta (lyr ^. out), _db = delta } : grads
                 , hadamard (transpose $ apply (lyr ^. activation . deriv) (lyr ^. pre)) (matmul lastWeights delta)
                 , lyr ^. weights)
         (grads, delta, lastWeights) = foldl compGradients ([], deltaL, outLyr ^. weights) [l | Dense l <- lyrs]
+        transposeGrad grad = grad & dw %~ transpose
+                                  & db %~ transpose

@@ -30,19 +30,18 @@ t = [[0, 1]]
 main :: IO ()
 main = do
   let net1 = initNetwork
-  let net2 = feedForward net1 x 
+  let net2 = feedForward net1 
   putStrLn "+++ Feeding forward +++"
   mapM_ prettyPrint $ [lyr ^. out | Dense lyr <- net2 ^. layers] 
   
   putStrLn "+++ Backprop ++++++++++"
   let gradients = backprop net2 t
-  mapM_ prettyPrint gradients
+  mapM_ prettyPrint [g ^. dw | g <- gradients]
   
 initNetwork :: Network 
 initNetwork = Network layers squaredError  
-  where test = zeros 2 3
-        layers = [ Input x
-                 , Dense (DenseData relu test test _T)
-                 , Dense (DenseData tanh test test _U)
-                 , Dense (DenseData sigmoid test test _V)
-                 , Dense (DenseData sigmoid test test _W)]
+  where layers = compose [ (Input x, 2)
+                         , (dense relu, 2)
+                         , (dense tanh, 1)
+                         , (dense sigmoid, 3)
+                         , (dense sigmoid, 2)]

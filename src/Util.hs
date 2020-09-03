@@ -12,7 +12,6 @@ import Control.Lens
 
 data Function a = Function { _func :: a
                            , _deriv :: a }
-
 $(makeLenses ''Function)
 
 fst3 :: (a,b,c) -> a
