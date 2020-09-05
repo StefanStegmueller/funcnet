@@ -11,6 +11,13 @@ packages:
       sha256: 97df1b96d825fb74400e75847e2a6ce2c37c9d1baeb71f5804a3a97694a4f881
   original:
     hackage: lens-4.19.2
+- completed:
+    hackage: normaldistribution-1.1.0.3@sha256:2615b784c4112cbf6ffa0e2b55b76790290a9b9dff18a05d8c89aa374b213477,2160
+    pantry-tree:
+      size: 269
+      sha256: 856818862d12df8b030fa9cfef2c4ffa604d06f0eb057498db245dfffcd60e3c
+  original:
+    hackage: normaldistribution-1.1.0.3
 snapshots:
 - completed:
     size: 532383

@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: c91fc00c627e56dd3a2cb9089a97ab95deef838234eae9aa06a03bc7397e3bb0
+-- hash: 61da5fc6a2866a7bf8639e1dd5edb1e9cda8e7cea03c69d56e690595df01cd64
 
 name:           funcnet
 version:        0.1.0.0
@@ -28,6 +28,7 @@ source-repository head
 library
   exposed-modules:
       Activation
+      Init
       Linalg
       Loss
       Network
@@ -39,6 +40,8 @@ library
   build-depends:
       base >=4.7 && <5
     , lens ==4.19.2
+    , normaldistribution ==1.1.0.3
+    , split ==0.2.3.4
   default-language: Haskell2010
 
 executable funcnet-exe
@@ -53,6 +56,8 @@ executable funcnet-exe
       base >=4.7 && <5
     , funcnet
     , lens ==4.19.2
+    , normaldistribution ==1.1.0.3
+    , split ==0.2.3.4
   default-language: Haskell2010
 
 executable simplenn-exe
@@ -67,6 +72,8 @@ executable simplenn-exe
       base >=4.7 && <5
     , funcnet
     , lens ==4.19.2
+    , normaldistribution ==1.1.0.3
+    , split ==0.2.3.4
   default-language: Haskell2010
 
 test-suite funcnet-test
@@ -84,4 +91,6 @@ test-suite funcnet-test
     , funcnet
     , hspec
     , lens ==4.19.2
+    , normaldistribution ==1.1.0.3
+    , split ==0.2.3.4
   default-language: Haskell2010

@@ -22,6 +22,8 @@ description:         Please see the README on GitHub at <https://github.com/Stef
 dependencies:
 - base >= 4.7 && < 5
 - lens == 4.19.2
+- normaldistribution == 1.1.0.3
+- split == 0.2.3.4
 
 library:
   source-dirs: src

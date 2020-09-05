@@ -40,8 +40,13 @@ main = do
   
 initNetwork :: Network 
 initNetwork = Network layers squaredError  
-  where layers = compose [ (Input x, 2)
-                         , (dense relu, 2)
-                         , (dense tanh, 1)
-                         , (dense sigmoid, 3)
-                         , (dense sigmoid, 2)]
+  where layers = customWeights $ compose [ (Input x, 2)
+                                         , (dense relu, 2)
+                                         , (dense tanh, 1)
+                                         , (dense sigmoid, 3)
+                                         , (dense sigmoid, 2)]
+
+
+customWeights :: [Layer] -> [Layer]
+customWeights (inp:lyrs) = inp : zipWith insert lyrs [_T, _U, _V, _W]
+  where insert (Dense d) w = Dense (d & weights .~ w) 
