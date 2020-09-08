@@ -24,6 +24,7 @@ import Control.Lens hiding (pre)
 import Activation
 import Loss
 import Linalg
+import Init
 import Util
 
 data DenseData = DenseData { _activation :: Activation
@@ -56,14 +57,14 @@ dense act = Dense DenseData { _activation = act
                             , _bias = zeros 1 1}
 
 
-compose :: [(Layer, Int)] -> [Layer]
+compose :: [(Layer, Int, (Int -> Int -> Matrix))] -> [Layer]
 compose lyrs = reverse $ compose' $ reverse lyrs 
-compose' []     = []
-compose' (x:xs) = initLayer x (snd $ head xs) : compose' xs 
-  where initLayer :: (Layer, Int) -> Int -> Layer 
-        initLayer (Dense d, m) n = Dense(d & weights .~ zeros n m
-                                           & bias .~ zeros 1 m)
-        initLayer (lyr, _) _     = lyr
+compose' [] = []
+compose' (x:xs) = (initLayer x (snd3 $ head xs) : compose' xs)
+  where initLayer :: (Layer, Int, (Int -> Int -> Matrix)) -> Int -> Layer 
+        initLayer (Dense d, m, init) n = Dense(d & weights .~ init n m
+                                                 & bias    .~ zeros 1 m)
+        initLayer (lyr, _, _) _        = lyr
 
 
 feedForward :: Network -> Network

@@ -5,6 +5,7 @@ import Control.Lens
 
 import Network 
 import Linalg
+import Init
 import Activation
 import Loss
 
@@ -40,11 +41,12 @@ main = do
   
 initNetwork :: Network 
 initNetwork = Network layers squaredError  
-  where layers = customWeights $ compose [ (Input x, 2)
-                                         , (dense relu, 2)
-                                         , (dense tanh, 1)
-                                         , (dense sigmoid, 3)
-                                         , (dense sigmoid, 2)]
+  where init = (he 1234)
+        layers = customWeights $ compose [ (Input x      , 2, init)
+                                         , (dense relu   , 2, init)
+                                         , (dense tanh   , 1, init)
+                                         , (dense sigmoid, 3, init)
+                                         , (dense sigmoid, 2, init)]
 
 
 customWeights :: [Layer] -> [Layer]
