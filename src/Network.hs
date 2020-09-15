@@ -76,7 +76,7 @@ forward :: Layer -> Matrix -> (Layer, Matrix)
 forward (Input x) _       = (Input x, x)
 forward (Dense d) lastOut = (Dense modDense, modDense ^. out) 
   where modPreAct lout lyr = lyr & pre.~ lout `matmul` (lyr ^. weights) `add` (lyr ^. bias)
-        modOut lyr = lyr & out .~ apply (lyr ^. activation . func) (lyr ^. pre)
+        modOut lyr = lyr & out .~ (lyr ^. activation . func) (lyr ^. pre)
         modDense = modOut $ modPreAct lastOut d
 
 
@@ -84,10 +84,10 @@ backprop :: Network -> Matrix -> [Gradient]
 backprop net t = map transposeGrad $ [Gradient { _dw = delta `matmul` x, _db = delta } | Input x <- lyrs] ++ grads
   where (Dense outLyr : lyrs) = reverse $ net ^. layers 
         dE_aL = elementWiseOp (net ^. loss . deriv) (outLyr ^. out) t
-        deltaL = transpose $ hadamard (apply (outLyr ^. activation . deriv) $ outLyr ^. pre) dE_aL 
+        deltaL = transpose $ hadamard ((outLyr ^. activation . deriv) $ outLyr ^. pre) dE_aL 
         compGradients (grads, delta, lastWeights) lyr =  
                 ( Gradient { _dw = matmul delta (lyr ^. out), _db = delta } : grads
-                , hadamard (transpose $ apply (lyr ^. activation . deriv) (lyr ^. pre)) (matmul lastWeights delta)
+                , hadamard (transpose $ (lyr ^. activation . deriv) (lyr ^. pre)) (matmul lastWeights delta)
                 , lyr ^. weights)
         (grads, delta, lastWeights) = foldl compGradients ([], deltaL, outLyr ^. weights) [l | Dense l <- lyrs]
         transposeGrad grad = grad & dw %~ transpose

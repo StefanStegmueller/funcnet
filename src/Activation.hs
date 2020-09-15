@@ -1,20 +1,21 @@
 module Activation 
     ( Activation
     , sigmoid
-    , sigmoidDeriv
     , tanh
-    , tanhDeriv
     , relu
-    , reluDeriv
+    , softmax 
     ) where
 
 import Prelude hiding (tanh)
-import Util
 
-type Activation = Function (Double -> Double)
+import Util
+import Linalg
+
+type Activation = Function (Matrix -> Matrix)
 
 sigmoid :: Activation 
-sigmoid = Function {_func = sigmoid', _deriv = sigmoidDeriv}
+sigmoid = Function { _func = apply sigmoid' 
+                   , _deriv = apply sigmoidDeriv }
 
 sigmoid' :: Double -> Double
 sigmoid' x = 1 / (+) 1 (exp $ -x)
@@ -23,18 +24,20 @@ sigmoidDeriv :: Double -> Double
 sigmoidDeriv x = sigmoid' x * (1 - sigmoid' x)
 
 tanh :: Activation 
-tanh = Function {_func = tanh', _deriv = tanhDeriv}
+tanh = Function { _func = apply tanh'
+                , _deriv = apply tanhDeriv } 
 
 tanh' :: Double -> Double
-tanh' x = num / denum
+tanh' x = num / denom
   where num = exp x - exp (- x)
-        denum = exp x + exp (- x)
+        denom = exp x + exp (- x)
 
 tanhDeriv :: Double -> Double
 tanhDeriv x = 1 - tanh' x ^ 2
 
 relu :: Activation
-relu = Function {_func = relu', _deriv = reluDeriv}
+relu = Function { _func = apply relu'
+                , _deriv = apply reluDeriv }
 
 relu' :: Double -> Double
 relu' x
@@ -45,3 +48,18 @@ reluDeriv :: Double -> Double
 reluDeriv x
   | x <= 0 = 0
   | otherwise = 1
+
+softmax :: Activation
+softmax = Function { _func = softmax'
+                   , _deriv = softmaxDeriv }
+
+softmax' :: Matrix -> Matrix
+softmax' m = [map (\x -> (exp x) / denom) vec]
+  where denom = sum $ map exp vec
+        vec = m !! 0
+
+softmaxDeriv :: Matrix -> Matrix
+softmaxDeriv m = [map term $ zip vec [0..]]
+  where term (x,i) = (exp x * (sum [exp n| (n, j) <- (zip vec [0..]), j /= i])) / sumSquared
+        sumSquared = (sum $ map exp vec) ** 2
+        vec = m !! 0
