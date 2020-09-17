@@ -1,62 +1,46 @@
-{-# LANGUAGE TemplateHaskell #-}
 
 module Main where
 
-import Control.Lens hiding (index)
+import Prelude hiding (tanh)
+import Control.Lens
 
+import Network 
 import Linalg
+import Init
+import Activation
+import Loss
+import Training
+
+-- Data x and labels t
+x = [[1, 1]
+    ,[0, 1]
+    ,[1, 0]
+    ,[0, 0]]
+
+t = [[0]
+    ,[1]
+    ,[1]
+    ,[0]]
 
 main :: IO ()
-main = putStrLn "hello"
+main = do
+  let net = initNetwork
+  let p = hParams 
+  train p net
+  return ()
 
--- Lenses example
+initNetwork :: Network 
+initNetwork = Network layers squaredError  
+  where init = (he 1234)
+        layers = compose [ (Input x      , 2, init)
+                         , (dense relu   , 2, init)
+                         , (dense tanh   , 1, init)
+                         , (dense sigmoid, 3, init)
+                         , (dense sigmoid, 1, init)]
 
-data Person = Person { _address:: Address 
-                     , _index :: Int}
-
-data Address = Address { _town:: String
-                       , _street :: String
-                       , _houseNr :: Int}
-
-$(makeLenses ''Person)
-$(makeLenses ''Address)
-
-lensGet1 :: Person -> Int
-lensGet1 p = view index p
-
-lensGet2 :: Person -> Int 
-lensGet2 p = p ^. index
-
-lensGet3 :: Person -> String
-lensGet3 p = p ^. address . street 
-
-lensSet1 :: Person -> Person
-lensSet1 p = set index 3 p 
-
-lensSet2 :: Person -> Person
-lensSet2 p = p & index .~ 3
-
--- view + apply function + set
-lensOver1 :: Person -> Person
-lensOver1 p = over index (\x -> x + 1) p
-
-lensOver2 :: Person -> Person
-lensOver2 p = p & index %~ (\x -> x + 1) 
-
--- Prisms Example
-
-data User = Real RealData
-          | Entity EntityData 
-
-data RealData = RD { _name :: String , _age :: Int }
-data EntityData = ED {_legalName :: String}
-
-$(makeLenses ''RealData)
-$(makeLenses ''EntityData)
-
-test :: User 
-test = Real RD { _name = "test", _age = 12  }
-
-
-
-
+hParams :: TrainParams
+hParams = TrainParams { _inps = x
+                      , _lbls = t
+                      , _epochs = 3
+                      , _batchSize = 2
+                      , _opt = (gradientDescent 0.03)}

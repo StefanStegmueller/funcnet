@@ -23,6 +23,16 @@ spec = do
     it "throws an exception because of different matrix dimensions" $ 
       evaluate (add [[1,2], [1,2]] [[1], [1]]) `shouldThrow` anyErrorCall
 
+  describe "sub" $ do
+      it "returns the correct subtraction" $ 
+        sub [[1,2], [2,1]] [[2,1], [1,2]] `shouldBe` [[-1,1],[1,-1]]
+  
+      it "throws an exception because of inconsistent matrix" $ 
+        evaluate (sub [[1,2], [1]] [[1], [1]]) `shouldThrow` anyErrorCall
+  
+      it "throws an exception because of different matrix dimensions" $ 
+        evaluate (sub [[1,2], [1,2]] [[1], [1]]) `shouldThrow` anyErrorCall
+
   describe "matmul" $ do
     it "returns the correct product" $ 
       matmul [[1,2], [2,1], [1,2]] [[2,1,2], [1,2,1]] `shouldBe` [[4,5,4],[5,4,5],[4,5,4]]

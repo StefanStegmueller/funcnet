@@ -7,6 +7,7 @@ module Linalg
     , elementWiseOp
     , transpose
     , add
+    , sub
     , matmul
     , smul
     , hadamard
@@ -37,7 +38,7 @@ prettyPrint mat = do
         printRow row = putStrLn $ toString row
 
 elementWiseOp :: (Double -> Double -> Double) -> Matrix -> Matrix -> Matrix
-elementWiseOp = (zipWith . zipWith) 
+elementWiseOp = zipWith . zipWith 
 
 checkConsistency :: Matrix -> Matrix
 checkConsistency m1
@@ -66,6 +67,10 @@ transpose m1 = [getColumn sm1 j | j <- [0 .. m-1]]
 add :: Matrix -> Matrix -> Matrix
 add m1 m2 = add' $ checkSameDims (checkConsistency m1, checkConsistency m2) 
   where add' (mat1, mat2) = elementWiseOp (+) mat1 mat2 
+
+sub :: Matrix -> Matrix -> Matrix
+sub m1 m2 = sub' $ checkSameDims (checkConsistency m1, checkConsistency m2) 
+  where sub' (mat1, mat2) = elementWiseOp (-) mat1 mat2 
 
 matmul :: Matrix -> Matrix -> Matrix
 matmul m1 m2 = matmul' $ checkMatchingDims (checkConsistency m1, checkConsistency m2)  

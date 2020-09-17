@@ -54,12 +54,12 @@ softmax = Function { _func = softmax'
                    , _deriv = softmaxDeriv }
 
 softmax' :: Matrix -> Matrix
-softmax' m = [map (\x -> (exp x) / denom) vec]
+softmax' m = [map (\x -> exp x / denom) vec]
   where denom = sum $ map exp vec
-        vec = m !! 0
+        vec = head m 
 
 softmaxDeriv :: Matrix -> Matrix
-softmaxDeriv m = [map term $ zip vec [0..]]
-  where term (x,i) = (exp x * (sum [exp n| (n, j) <- (zip vec [0..]), j /= i])) / sumSquared
-        sumSquared = (sum $ map exp vec) ** 2
-        vec = m !! 0
+softmaxDeriv m = [zipWith term vec [0..]]
+  where term x i = (exp x * sum [exp n| (n, j) <- zip vec [0..], j /= i]) / sumSquared
+        sumSquared = sum (map exp vec) ** 2
+        vec = head m 

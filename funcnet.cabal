@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 61da5fc6a2866a7bf8639e1dd5edb1e9cda8e7cea03c69d56e690595df01cd64
+-- hash: 5d8982b48a42d0dcac8ede6e5ea826b8ba18cfb4684457329f6cb69e40421eaa
 
 name:           funcnet
 version:        0.1.0.0
@@ -32,6 +32,7 @@ library
       Linalg
       Loss
       Network
+      Training
       Util
   other-modules:
       Paths_funcnet

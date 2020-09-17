@@ -7,6 +7,7 @@ module Network
   , pre
   , out
   , weights
+  , bias
   , Network (..)
   , layers
   , loss
@@ -28,10 +29,10 @@ import Init
 import Util
 
 data DenseData = DenseData { _activation :: Activation
-                   , _pre :: Matrix
-                   , _out :: Matrix
-                   , _weights :: Matrix
-                   , _bias :: Matrix } 
+                           , _pre :: Matrix
+                           , _out :: Matrix
+                           , _weights :: Matrix
+                           , _bias :: Matrix } 
 makeLenses ''DenseData
 
 
@@ -54,14 +55,14 @@ dense act = Dense DenseData { _activation = act
                             , _pre = zeros 1 1
                             , _out = zeros 1 1
                             , _weights = zeros 1 1
-                            , _bias = zeros 1 1}
+                            , _bias = zeros 1 1 }
 
 
-compose :: [(Layer, Int, (Int -> Int -> Matrix))] -> [Layer]
+compose :: [(Layer, Int, Int -> Int -> Matrix)] -> [Layer]
 compose lyrs = reverse $ compose' $ reverse lyrs 
 compose' [] = []
-compose' (x:xs) = (initLayer x (snd3 $ head xs) : compose' xs)
-  where initLayer :: (Layer, Int, (Int -> Int -> Matrix)) -> Int -> Layer 
+compose' (x:xs) = initLayer x (snd3 $ head xs) : compose' xs
+  where initLayer :: (Layer, Int, Int -> Int -> Matrix) -> Int -> Layer 
         initLayer (Dense d, m, init) n = Dense(d & weights .~ init n m
                                                  & bias    .~ zeros 1 m)
         initLayer (lyr, _, _) _        = lyr
