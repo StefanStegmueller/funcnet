@@ -18,6 +18,7 @@ module Network
   , compose
   , feedForward
   , backprop
+  , computeLoss
   ) where
 
 import Control.Lens hiding (pre)
@@ -38,6 +39,7 @@ makeLenses ''DenseData
 
 data Layer = Input Matrix
            | Dense DenseData
+
 
 
 data Network = Network { _layers :: [Layer]
@@ -83,13 +85,19 @@ forward (Dense d) lastOut = (Dense modDense, modDense ^. out)
 
 backprop :: Network -> Matrix -> [Gradient]
 backprop net t = map transposeGrad $ [Gradient { _dw = delta `matmul` x, _db = delta } | Input x <- lyrs] ++ grads
-  where (Dense outLyr : lyrs) = reverse $ net ^. layers 
-        dE_aL = elementWiseOp (net ^. loss . deriv) (outLyr ^. out) t
-        deltaL = transpose $ hadamard ((outLyr ^. activation . deriv) $ outLyr ^. pre) dE_aL 
+  where (Dense outLyr : lyrs) = reverse $ net^.layers 
+        dE_aL = elementWiseOp (net^.loss.deriv) (outLyr^.out) t
+        deltaL = transpose $ hadamard ((outLyr^.activation.deriv) $ outLyr^.pre) dE_aL 
         compGradients (grads, delta, lastWeights) lyr =  
-                ( Gradient { _dw = matmul delta (lyr ^. out), _db = delta } : grads
-                , hadamard (transpose $ (lyr ^. activation . deriv) (lyr ^. pre)) (matmul lastWeights delta)
-                , lyr ^. weights)
-        (grads, delta, lastWeights) = foldl compGradients ([], deltaL, outLyr ^. weights) [l | Dense l <- lyrs]
+                ( Gradient { _dw = matmul delta (lyr^.out), _db = delta } : grads
+                , hadamard (transpose $ (lyr^.activation.deriv) (lyr^.pre)) (matmul lastWeights delta)
+                , lyr^.weights)
+        (grads, delta, lastWeights) = foldl compGradients ([], deltaL, outLyr^.weights) [l | Dense l <- lyrs]
         transposeGrad grad = grad & dw %~ transpose
                                   & db %~ transpose
+
+computeLoss :: Network -> Matrix -> Double
+computeLoss net t = (1 / fromIntegral (length y)) * (sum $ zipWith (net^.loss.func) y tv)
+  where y = head ((last $ [d | Dense d <- net^.layers])^.out)
+        tv = head t
+
