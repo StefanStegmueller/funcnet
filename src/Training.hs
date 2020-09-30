@@ -23,7 +23,7 @@ makeLenses ''TrainParams
 gradientDescent :: Double -> Matrix -> Matrix -> Matrix
 gradientDescent alpha grad mat = mat `sub` (alpha `smul` grad)
 
--- | TODO: Write description
+
 train :: TrainParams -> Network -> IO Network
 train params net = train' params net $ params ^. epochs  
 train' params net 0 = return net
