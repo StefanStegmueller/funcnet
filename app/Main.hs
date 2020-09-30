@@ -12,10 +12,10 @@ import Loss
 import Training
 
 -- Data x and labels t
-x = [[1, 1, 3, 5]
-    ,[0, 1, 1, 9]
-    ,[1, 0, 2, 1]
-    ,[0, 0, 10, 22]]
+x = [[1, 1]
+    ,[0, 1]
+    ,[1, 0]
+    ,[0, 0]]
 
 t = [[0]
     ,[1]
@@ -34,6 +34,8 @@ initNetwork :: Network
 initNetwork = Network layers squaredError  
   where init = (he 1234)
         layers = compose [ (Input x      , 2, init)
+                         , (dense relu   , 2, init)
+                         , (dense tanh   , 1, init)
                          , (dense sigmoid, 3, init)
                          , (dense sigmoid, 1, init)]
 

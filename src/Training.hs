@@ -56,8 +56,7 @@ processBatch net batch = (map normalize sumGrads, losses)
         (gradients, losses) = unzip $ map (processStep net) batch
         modGrad sum gr = sum & dw %~ add (gr ^. dw)
                              & db %~ add (gr ^. db)
-        dummyGrad = Gradient { _dw = zeros 1 1, _db = zeros 1 1 }
-        sumGrads = map (foldl modGrad dummyGrad) $ transpose gradients 
+        sumGrads = map (foldl1 modGrad) $ transpose gradients 
 
 
 processStep :: Network -> ([Double],[Double]) -> ([Gradient], Double)
@@ -66,4 +65,3 @@ processStep net (x, t) = (gradients, loss)
         forwardedNet = feedForward $ newInputNet [x] net
         gradients = backprop forwardedNet [t]
         loss = computeLoss forwardedNet [t]
-
