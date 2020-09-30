@@ -1,4 +1,4 @@
-module Main where
+module SimpleTrain where
 
 import Prelude hiding (tanh)
 import Control.Lens

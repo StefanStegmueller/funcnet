@@ -1,4 +1,4 @@
-module SimpleNN where
+module SimpleStep where
 
 import Prelude hiding (tanh)
 import Control.Lens

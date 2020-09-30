@@ -38,16 +38,26 @@ executables:
     - -with-rtsopts=-N
     dependencies:
     - funcnet 
-  simplenn-exe:
-    main:                SimpleNN.hs
+  simplestep-exe:
+    main:                SimpleStep.hs
     source-dirs:         app
     ghc-options:
     - -threaded
     - -rtsopts
     - -with-rtsopts=-N
-    - -main-is SimpleNN
+    - -main-is SimpleStep
     dependencies:
     - funcnet 
+  simpletrain-exe:
+    main:                SimpleTrain.hs
+    source-dirs:         app
+    ghc-options:
+    - -threaded
+    - -rtsopts
+    - -with-rtsopts=-N
+    - -main-is SimpleTrain
+    dependencies:
+    - funcnet
 
 tests:
   funcnet-test:
