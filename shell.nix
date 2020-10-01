@@ -3,7 +3,8 @@ mkShell {
   buildInputs = [
     stack
     ghc
-    ghcid
-    hlint
+    ghcid 
+    hlint # linter
+    ormolu # code fomatting
   ];
 }
