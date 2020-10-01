@@ -4,6 +4,7 @@ module Training
   ( TrainParams (..),
     train,
     gradientDescent,
+    shuffleData,
   )
 where
 
@@ -12,6 +13,7 @@ import Data.List (transpose)
 import Data.List.Split (chunksOf)
 import Linalg hiding (transpose)
 import Network
+import Util (shuffle)
 
 data TrainParams = TrainParams
   { _inps :: Matrix,
@@ -28,13 +30,20 @@ gradientDescent alpha grad mat = mat `sub` (alpha `smul` grad)
 
 train :: TrainParams -> Network -> IO Network
 train params net = train' params net $ params ^. epochs
-
 train' params net 0 = return net
 train' params net e = do
-  let (nextNet, loss) = trainEpoch params net
+  (modX, modT) <- shuffleData (params^.inps, params^.lbls)
+  let modParams = params & inps .~ modX
+                         & lbls .~ modT
+  let (nextNet, loss) = trainEpoch modParams net
   putStrLn $ "Epoch " ++ show ((params ^. epochs) - e + 1) ++ ":"
   putStrLn $ "Loss -> " ++ show loss
   train' params nextNet $ e - 1
+
+shuffleData :: (Matrix, Matrix) -> IO (Matrix, Matrix)
+shuffleData (x, t) = do 
+  shuffledData <- shuffle $ zip x t
+  return $ unzip shuffledData
 
 trainEpoch :: TrainParams -> Network -> (Network, Double)
 trainEpoch params net = (trainedNet, (1 / fromIntegral (length losses)) * sum losses)

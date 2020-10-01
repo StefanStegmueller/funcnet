@@ -21,6 +21,8 @@ description:         Please see the README on GitHub at <https://github.com/Stef
 
 dependencies:
 - base >= 4.7 && < 5
+- random == 1.1
+- array == 0.5.4.0
 - lens == 4.19.2
 - normaldistribution == 1.1.0.3
 - split == 0.2.3.4
