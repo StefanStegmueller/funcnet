@@ -9,12 +9,14 @@ module Util
     trd3,
     apply,
     shuffle,
+    fromList2,
   )
 where
 
 import Control.Lens
 import Control.Monad
 import Data.Array.IO
+import qualified Data.Vector as V
 import System.Random
 
 data Function a = Function
@@ -33,8 +35,8 @@ snd3 (_, b, _) = b
 trd3 :: (a, b, c) -> c
 trd3 (_, _, c) = c
 
-apply :: (a -> b) -> [[a]] -> [[b]]
-apply f lst = (map . map) f lst
+apply :: (a -> b) -> V.Vector (V.Vector (a)) -> V.Vector (V.Vector (b))
+apply f vec = (V.map . V.map) f vec
 
 -- | Randomly shuffle a list
 --   /O(N)/
@@ -51,3 +53,6 @@ shuffle xs = do
     n = length xs
     newArray :: Int -> [a] -> IO (IOArray Int a)
     newArray n xs = newListArray (1, n) xs
+
+fromList2 :: [[a]] -> V.Vector (V.Vector (a))
+fromList2 xs = V.fromList $ map V.fromList xs

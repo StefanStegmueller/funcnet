@@ -23,9 +23,11 @@ dependencies:
 - base >= 4.7 && < 5
 - random == 1.1
 - array == 0.5.4.0
+- vector == 0.12.1.2
 - lens == 4.19.2
 - normaldistribution == 1.1.0.3
 - split == 0.2.3.4
+- vector-split == 1.0.0.2 
 
 library:
   source-dirs: src

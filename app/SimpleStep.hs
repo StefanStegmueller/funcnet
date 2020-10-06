@@ -6,33 +6,34 @@ import Init
 import Linalg
 import Loss
 import Network
+import Util (fromList2)
 import Prelude hiding (tanh)
 
 -- Artificial Neural Network Example
 
 -- Initial weight matrices
-_T =
+_T = fromList2
   [ [0.19, -0.92],
     [-0.42, -0.28]
   ]
 
-_U =
+_U = fromList2
   [ [0.61],
     [-1.5]
   ]
 
-_V = [[1.5, -0.81, -0.24]]
+_V = fromList2 [[1.5, -0.81, -0.24]]
 
-_W =
+_W = fromList2
   [ [-1.4, -0.81],
     [-2.2, -1.7],
     [-0.27, -0.73]
   ]
 
 -- Input x and label t
-x = [[-1, 1]]
+x = fromList2 [[-1, 1]]
 
-t = [[0, 1]]
+t = fromList2 [[0, 1]]
 
 main :: IO ()
 main = do

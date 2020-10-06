@@ -9,6 +9,7 @@ import Loss
 import Network
 import System.IO
 import Training
+import Util (fromList2)
 import Prelude hiding (tanh)
 
 dataPath = "./data/"
@@ -42,14 +43,14 @@ readInputData fpath = do
   contents <- readFile fpath
   let strings = map (splitOn ",") $ lines contents
   let mat = (map . map) (\s -> read s :: Double) strings
-  return mat
+  return $ fromList2 mat
 
 readLabelData :: String -> IO Matrix
 readLabelData fpath = do
   contents <- readFile fpath
   let labels = map (\s -> read s :: Integer) $ lines contents
   let onehot n = [if i == n then 1 else 0 | i <- [0 .. 9]]
-  return (map onehot labels)
+  return $ fromList2 $ map onehot labels
 
 initNetwork :: Network
 initNetwork = Network layers binaryCrossEntropy
@@ -57,7 +58,7 @@ initNetwork = Network layers binaryCrossEntropy
     init = (he 1234)
     layers =
       compose
-        [ (Input [[0]], 784, init),
+        [ (Input (zeros 1 1), 784, init),
           (dense relu, 100, init),
           (dense softmax, 10, init)
         ]

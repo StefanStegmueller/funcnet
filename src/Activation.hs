@@ -7,6 +7,7 @@ module Activation
   )
 where
 
+import qualified Data.Vector as V
 import Linalg
 import Util
 import Prelude hiding (tanh)
@@ -67,14 +68,15 @@ softmax =
     }
 
 softmax' :: Matrix -> Matrix
-softmax' m = [map (\x -> exp x / denom) vec]
+softmax' m = V.singleton $ V.map (\x -> exp x / denom) vec
   where
-    denom = sum $ map exp vec
-    vec = head m
+    denom = V.sum $ V.map exp vec
+    vec = V.head m
 
 softmaxDeriv :: Matrix -> Matrix
-softmaxDeriv m = [zipWith term vec [0 ..]]
+softmaxDeriv m = V.singleton $ V.zipWith term vec (vecIndex vec)
   where
-    term x i = (exp x * sum [exp n | (n, j) <- zip vec [0 ..], j /= i]) / sumSquared
-    sumSquared = sum (map exp vec) ** 2
-    vec = head m
+    term x i = (exp x * V.sum (V.zipWith (\n j -> if j /= i then exp n else 0.0) vec (vecIndex vec))) / sumSquared
+    sumSquared = V.sum (V.map exp vec) ** 2
+    vecIndex v = (V.enumFromN 0 $ V.length v)
+    vec = V.head m

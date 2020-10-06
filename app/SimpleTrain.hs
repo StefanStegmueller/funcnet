@@ -7,17 +7,18 @@ import Linalg
 import Loss
 import Network
 import Training
+import Util (fromList2)
 import Prelude hiding (tanh)
 
 -- Data x and labels t
-x =
+x = fromList2 
   [ [1, 1],
     [0, 1],
     [1, 0],
     [0, 0]
   ]
 
-t =
+t = fromList2
   [ [0],
     [1],
     [1],

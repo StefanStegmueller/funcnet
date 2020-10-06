@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: c0fc20f4a854c07f996f9ecc9ee5242b009e7f4c2c73809fe64c1cebe6ce81c8
+-- hash: 45e28988e144dbca7274bb237affbaa8b3cbb7e6a25cec958a01c4414544e8d0
 
 name:           funcnet
 version:        0.1.0.0
@@ -45,6 +45,8 @@ library
     , normaldistribution ==1.1.0.3
     , random ==1.1
     , split ==0.2.3.4
+    , vector ==0.12.1.2
+    , vector-split ==1.0.0.2
   default-language: Haskell2010
 
 executable funcnet-exe
@@ -64,6 +66,8 @@ executable funcnet-exe
     , normaldistribution ==1.1.0.3
     , random ==1.1
     , split ==0.2.3.4
+    , vector ==0.12.1.2
+    , vector-split ==1.0.0.2
   default-language: Haskell2010
 
 executable simplestep-exe
@@ -83,6 +87,8 @@ executable simplestep-exe
     , normaldistribution ==1.1.0.3
     , random ==1.1
     , split ==0.2.3.4
+    , vector ==0.12.1.2
+    , vector-split ==1.0.0.2
   default-language: Haskell2010
 
 executable simpletrain-exe
@@ -102,6 +108,8 @@ executable simpletrain-exe
     , normaldistribution ==1.1.0.3
     , random ==1.1
     , split ==0.2.3.4
+    , vector ==0.12.1.2
+    , vector-split ==1.0.0.2
   default-language: Haskell2010
 
 test-suite funcnet-test
@@ -123,4 +131,6 @@ test-suite funcnet-test
     , normaldistribution ==1.1.0.3
     , random ==1.1
     , split ==0.2.3.4
+    , vector ==0.12.1.2
+    , vector-split ==1.0.0.2
   default-language: Haskell2010

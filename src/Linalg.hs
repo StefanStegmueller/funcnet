@@ -14,41 +14,44 @@ module Linalg
   )
 where
 
-type Matrix = [[Double]]
+import qualified Data.Vector as V
+import Prelude
+
+type Matrix = V.Vector (V.Vector (Double))
 
 zeros :: Int -> Int -> Matrix
-zeros n m = replicate n $ take m [0.0, 0.0 ..]
+zeros n m = V.replicate n $ V.fromList $ take m [0.0, 0.0 ..]
 
 rows :: Matrix -> Int
-rows m1 = length $ checkConsistency m1
+rows m1 = V.length $ checkConsistency m1
 
 cols :: Matrix -> Int
-cols m1 = length $ head $ checkConsistency m1
+cols m1 = V.length $ V.head $ checkConsistency m1
 
-getRow :: Matrix -> Int -> [Double]
-getRow m1 r = m1 !! r
+getRow :: Matrix -> Int -> V.Vector (Double)
+getRow m1 r = m1 V.! r
 
-getColumn :: Matrix -> Int -> [Double]
-getColumn m1 c = [row !! c | row <- m1]
+getColumn :: Matrix -> Int -> V.Vector (Double)
+getColumn m1 c = V.map (flip (V.!) $ c) m1
 
 prettyPrint :: Matrix -> IO ()
 prettyPrint mat = do
-  mapM_ printRow mat
+  V.mapM_ printRow mat
   putStrLn ""
   where
-    toString lst = concatMap (\x -> show x ++ "\t") lst
+    toString vec = concatMap (\x -> show x ++ "\t") vec
     printRow row = putStrLn $ toString row
 
 elementWiseOp :: (Double -> Double -> Double) -> Matrix -> Matrix -> Matrix
-elementWiseOp = zipWith . zipWith
+elementWiseOp = (V.zipWith . V.zipWith)
 
 checkConsistency :: Matrix -> Matrix
 checkConsistency m1
   | inconsistent m1 = error "Matrix is not consistent."
   | otherwise = m1
   where
-    cs = length $ head m1
-    inconsistent mat = any (\x -> length x /= cs) mat
+    cs = V.length $ V.head m1
+    inconsistent mat = V.any (\x -> V.length x /= cs) mat
 
 checkSameDims :: (Matrix, Matrix) -> (Matrix, Matrix)
 checkSameDims (m1, m2)
@@ -65,7 +68,7 @@ checkMatchingDims (m1, m2)
     matchingDims m1 m2 = cols m1 == rows m2
 
 transpose :: Matrix -> Matrix
-transpose m1 = [getColumn sm1 j | j <- [0 .. m -1]]
+transpose m1 = V.fromList [getColumn sm1 j | j <- [0 .. m -1]]
   where
     sm1 = checkConsistency m1
     m = cols m1
@@ -85,13 +88,13 @@ matmul m1 m2 = matmul' $ checkMatchingDims (checkConsistency m1, checkConsistenc
   where
     n = rows m1
     m = cols m2
-    sumprod i j mat1 mat2 = sum $ zipWith (*) (getRow mat1 i) (getColumn mat2 j)
-    matmul' (mat1, mat2) = [[sumprod i j mat1 mat2 | j <- [0 .. m -1]] | i <- [0 .. n -1]]
+    sumprod i j mat1 mat2 = sum $ V.zipWith (*) (getRow mat1 i) (getColumn mat2 j)
+    matmul' (mat1, mat2) = V.fromList [V.fromList [sumprod i j mat1 mat2 | j <- [0 .. m -1]] | i <- [0 .. n -1]]
 
 smul :: Double -> Matrix -> Matrix
 smul s m1 = smul' $ checkConsistency m1
   where
-    smul' mat1 = [[s * e | e <- row] | row <- mat1]
+    smul' mat1 = (V.map . V.map) ((*) s) mat1
 
 hadamard :: Matrix -> Matrix -> Matrix
 hadamard m1 m2 = hadamard' $ checkSameDims (checkConsistency m1, checkConsistency m2)

@@ -24,6 +24,7 @@ where
 
 import Activation
 import Control.Lens hiding (pre)
+import qualified Data.Vector as V
 import Init
 import Linalg
 import Loss
@@ -112,7 +113,7 @@ backprop net t = map transposeGrad $ [Gradient {_dw = delta `matmul` x, _db = de
         & db %~ transpose
 
 computeLoss :: Network -> Matrix -> Double
-computeLoss net t = (1 / fromIntegral (length y)) * (sum $ zipWith (net ^. loss . func) y tv)
+computeLoss net t = (1 / fromIntegral (V.length y)) * (V.sum $ V.zipWith (net ^. loss . func) y tv)
   where
-    y = head ((last $ [d | Dense d <- net ^. layers]) ^. out)
-    tv = head t
+    y = V.head ((last $ [d | Dense d <- net ^. layers]) ^. out)
+    tv = V.head t
