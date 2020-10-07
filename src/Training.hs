@@ -86,7 +86,6 @@ processBatch net batch = (map normalize sumGrads, losses)
 processStep :: Network -> (V.Vector Double, V.Vector Double) -> ([Gradient], Double)
 processStep net (x, t) = (gradients, loss)
   where
-    newInputNet inp n = n & layers .~ (Input inp : [Dense d | Dense d <- n ^. layers])
-    forwardedNet = feedForward $ newInputNet (V.singleton x) net
+    forwardedNet = feedForward $ insertInput (V.singleton x) net
     gradients = backprop forwardedNet (V.singleton t)
     loss = computeLoss forwardedNet (V.singleton t)

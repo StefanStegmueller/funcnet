@@ -16,6 +16,7 @@ module Network
     db,
     dense,
     compose,
+    insertInput,
     feedForward,
     backprop,
     computeLoss,
@@ -82,6 +83,9 @@ compose' (x : xs) = initLayer x (snd3 $ head xs) : compose' xs
             & bias .~ zeros 1 m
         )
     initLayer (lyr, _, _) _ = lyr
+
+insertInput :: Matrix -> Network -> Network
+insertInput inp n = n & layers .~ (Input inp : [Dense d | Dense d <- n ^. layers])
 
 feedForward :: Network -> Network
 feedForward net = net & layers .~ map fst (foldl feedLayer [] $ net ^. layers)
