@@ -44,7 +44,7 @@ binaryCrossEntropy =
     }
 
 binaryCrossEntropy' :: Double -> Double -> Double
-binaryCrossEntropy' y t = - ((t * log y) + ((1 - t) * log (1 - y)))
+binaryCrossEntropy' y t = - ((t * (log y)) + ((1 - t) * (log (1 - y))))
 
 binaryCrossEntropyDeriv :: Double -> Double -> Double
-binaryCrossEntropyDeriv y t = (t - y) / (y * (1 - y))
+binaryCrossEntropyDeriv y t = (y - t) / (y * (1 - y))
