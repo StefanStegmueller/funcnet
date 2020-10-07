@@ -1,6 +1,7 @@
 module Loss
   ( Loss (..),
     squaredError,
+    crossEntropy,
     binaryCrossEntropy,
   )
 where
@@ -21,6 +22,19 @@ squaredError' y t = (t - y) ^ 2
 
 squaredErrorDeriv :: Double -> Double -> Double
 squaredErrorDeriv y t = 2 * (y - t)
+
+crossEntropy :: Loss
+crossEntropy =
+  Function
+    { _func = crossEntropy',
+      _deriv = crossEntropyDeriv
+    }
+
+crossEntropy' :: Double -> Double -> Double
+crossEntropy' y t = - t * (log y)
+
+crossEntropyDeriv :: Double -> Double -> Double
+crossEntropyDeriv y t = - (t / y)
 
 binaryCrossEntropy :: Loss
 binaryCrossEntropy =
