@@ -33,8 +33,10 @@ crossEntropy =
 crossEntropy' :: Double -> Double -> Double
 crossEntropy' y t = - t * (log y)
 
+-- TODO: go back to correct implementation, is currently returning cross entropy + softmax gradient
 crossEntropyDeriv :: Double -> Double -> Double
-crossEntropyDeriv y t = - (t / y)
+--crossEntropyDeriv y t = - (t / y)
+crossEntropyDeriv y t = y - t 
 
 binaryCrossEntropy :: Loss
 binaryCrossEntropy =

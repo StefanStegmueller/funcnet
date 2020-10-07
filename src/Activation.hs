@@ -12,13 +12,14 @@ import Linalg
 import Util
 import Prelude hiding (tanh)
 
+-- | Derivatives have to be either diagonal matrices or Jacobian's
 type Activation = Function (Matrix -> Matrix)
 
 sigmoid :: Activation
 sigmoid =
   Function
     { _func = apply sigmoid',
-      _deriv = apply sigmoidDeriv
+      _deriv = toDiag . V.head . apply sigmoidDeriv
     }
 
 sigmoid' :: Double -> Double
@@ -31,7 +32,7 @@ tanh :: Activation
 tanh =
   Function
     { _func = apply tanh',
-      _deriv = apply tanhDeriv
+      _deriv = toDiag . V.head . apply tanhDeriv
     }
 
 tanh' :: Double -> Double
@@ -47,7 +48,7 @@ relu :: Activation
 relu =
   Function
     { _func = apply relu',
-      _deriv = apply reluDeriv
+      _deriv = toDiag . V.head . apply reluDeriv
     }
 
 relu' :: Double -> Double
@@ -73,10 +74,14 @@ softmax' m = V.singleton $ V.map (\x -> exp x / denom) vec
     denom = V.sum $ V.map exp vec
     vec = V.head m
 
+-- TODO: fix correct implementation, currently is just passing values
 softmaxDeriv :: Matrix -> Matrix
-softmaxDeriv m = V.singleton $ V.zipWith term vec (vecIndex vec)
-  where
-    term x i = (exp x * V.sum (V.zipWith (\n j -> if j /= i then exp n else 0.0) vec (vecIndex vec))) / sumSquared
-    sumSquared = V.sum (V.map exp vec) ** 2
-    vecIndex v = (V.enumFromN 0 $ V.length v)
-    vec = V.head m
+--softmaxDeriv m = generate2 l l distinction
+--  where
+--    vec = V.head m
+--    l = V.length vec
+--    distinction i j =
+--      if i == j
+--        then (vec V.! j) * (1 - (vec V.! j))
+--        else - ((vec V.! j) * (vec V.! i))
+softmaxDeriv m = toDiag $ V.replicate (V.length $ V.head m) 1

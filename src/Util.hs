@@ -10,6 +10,7 @@ module Util
     apply,
     shuffle,
     fromList2,
+    generate2,
   )
 where
 
@@ -56,3 +57,6 @@ shuffle xs = do
 
 fromList2 :: [[a]] -> V.Vector (V.Vector (a))
 fromList2 xs = V.fromList $ map V.fromList xs
+
+generate2 :: Int -> Int -> (Int -> Int -> a) -> V.Vector (V.Vector a)
+generate2 m n fu = V.generate m (\i -> V.generate n (\j -> fu i j))

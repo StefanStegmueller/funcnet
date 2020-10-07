@@ -97,3 +97,7 @@ spec = do
 
     it "throws an exception because of different matrix dimensions" $
       evaluate (hadamard m4 m8) `shouldThrow` anyErrorCall
+
+  describe "toDiag" $ do
+    it "returns the correct diagonal matrix" $
+      toDiag (V.fromList [1,2,3]) `shouldBe` (fromList2 [[1,0,0],[0,2,0],[0,0,3]])

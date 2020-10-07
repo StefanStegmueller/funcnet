@@ -1,6 +1,7 @@
 module Linalg
   ( Matrix,
     zeros,
+    toDiag,
     rows,
     cols,
     prettyPrint,
@@ -20,7 +21,14 @@ import Prelude
 type Matrix = V.Vector (V.Vector (Double))
 
 zeros :: Int -> Int -> Matrix
-zeros n m = V.replicate n $ V.fromList $ take m [0.0, 0.0 ..]
+zeros n m = V.replicate n $ V.generate m (\_ -> 0.0)
+
+toDiag :: V.Vector Double -> Matrix
+toDiag vec = V.zipWith genRow vec indexes
+  where
+    vecLen = V.length vec
+    indexes = V.enumFromN 0 vecLen
+    genRow v i = V.generate vecLen (\j -> if i == j then v else 0)
 
 rows :: Matrix -> Int
 rows m1 = V.length $ checkConsistency m1

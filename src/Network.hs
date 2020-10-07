@@ -100,11 +100,11 @@ backprop :: Network -> Matrix -> [Gradient]
 backprop net t = map transposeGrad $ [Gradient {_dw = delta `matmul` x, _db = delta} | Input x <- lyrs] ++ grads
   where
     (Dense outLyr : lyrs) = reverse $ net ^. layers
-    dE_aL = elementWiseOp (net ^. loss . deriv) (outLyr ^. out) t
-    deltaL = transpose $ hadamard ((outLyr ^. activation . deriv) $ outLyr ^. pre) dE_aL
+    dE_aL = transpose $ elementWiseOp (net ^. loss . deriv) (outLyr ^. out) t
+    deltaL = matmul ((outLyr ^. activation . deriv) $ outLyr ^. pre) dE_aL
     compGradients (grads, delta, lastWeights) lyr =
       ( Gradient {_dw = matmul delta (lyr ^. out), _db = delta} : grads,
-        hadamard (transpose $ (lyr ^. activation . deriv) (lyr ^. pre)) (matmul lastWeights delta),
+        matmul ((lyr ^. activation . deriv) (lyr ^. pre)) (matmul lastWeights delta),
         lyr ^. weights
       )
     (grads, delta, lastWeights) = foldl compGradients ([], deltaL, outLyr ^. weights) [l | Dense l <- lyrs]
